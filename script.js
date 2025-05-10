@@ -737,6 +737,7 @@ const userData = {
   },
 };
 
+const chatHistory = [];
 const initialInputHeight = messageInput.scrollHeight;
 
 // Create message element with dynamic classes and return it
@@ -751,24 +752,24 @@ const createMessageElement = (content, ...classes) => {
 const generateBotResponse = async (incomingMessageDiv) => {
   const messageElement = incomingMessageDiv.querySelector(".message-text");
 
+  // Add user message to chat history
+  chatHistory.push({
+    role: "user",
+    parts: [
+      { text: userData.message },
+      ...(userData.file.data ? [{ inline_data: userData.file }] : []),
+    ],
+  });
+
   // API request options
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: userData.message,
-              // text: `${context}\nPertanyaan : ${userData.message}. Jawablah sesuai konteks di atas. JIka tahu tahu/mengerti jawab dengan "Maaf saya tidak mengerti. Coba tanyakan hal lain"`,
-            },
-            ...(userData.file.data ? [{ inline_data: userData.file }] : []),
-          ],
-        },
-      ],
+      contents: chatHistory,
     }),
   };
+  // `${context}\nPertanyaan : ${userData.message}. Jawablah sesuai konteks di atas. JIka tahu tahu/mengerti jawab dengan "Maaf saya tidak mengerti. Coba tanyakan hal lain"`
 
   try {
     // Fetch bot response from API
@@ -781,6 +782,12 @@ const generateBotResponse = async (incomingMessageDiv) => {
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .trim();
     messageElement.innerText = apiResponseText;
+
+    // Add bot response to chat history
+    chatHistory.push({
+      role: "model",
+      parts: [{ text: userData.message }],
+    });
   } catch (error) {
     // Handle error in API response
     console.log(error);
