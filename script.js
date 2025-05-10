@@ -760,7 +760,8 @@ const generateBotResponse = async (incomingMessageDiv) => {
         {
           parts: [
             {
-              text: `${context}\nPertanyaan : ${userData.message}. Jawablah sesuai konteks di atas. JIka tahu tahu/mengerti jawab dengan "Maaf saya tidak mengerti. Coba tanyakan hal lain"`,
+              text: userData.message,
+              // text: `${context}\nPertanyaan : ${userData.message}. Jawablah sesuai konteks di atas. JIka tahu tahu/mengerti jawab dengan "Maaf saya tidak mengerti. Coba tanyakan hal lain"`,
             },
             ...(userData.file.data ? [{ inline_data: userData.file }] : []),
           ],
